@@ -1,5 +1,9 @@
-from vix import getVIXData
+from vix import getContango, getEMA, getSMA, getUVXYAverages
 
-uvxy_average = getVIXData()
+# VIX Relevant variables
+contango = getContango()
+EMA = getEMA()
+SMA = getSMA()
+UVXY_Averages = getUVXYAverages()
 
-print(uvxy_average)
+
