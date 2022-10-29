@@ -1,6 +1,3 @@
-from re import L
-from numpy import average
-from sqlalchemy import false, true
 import yfinance as yf
 import datetime
 import logging
