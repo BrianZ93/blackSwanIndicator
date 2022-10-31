@@ -29,11 +29,13 @@ data = yf.download("UVXY", start=start_string, end=today_string)
 
 # Creating the List of Prices
 uvxy_prices = []
+uvxy_dates = []
 uvxy_historical_prices = dict()
 for index, row in data.iterrows():
     date = (datetime.datetime(index.year, index.month, index.day)).strftime("%x")
     uvxy_historical_prices[date] = row['Close']
     uvxy_prices.append(row['Close'])
+    uvxy_dates.append(date)
 
 
 # *** DAILY AVERAGES ***
@@ -214,29 +216,91 @@ else:
 # 1 Year Time Period
 # 30 day SMA/EMA
 time_period = 365
-moving_time_period = 30
 SMA_30_DAY = []
 EMA_30_DAY = []
-smoothing = 2
-prices_used = []
-weighting = smoothing/(moving_time_period + 1)
+smoothing_30_day = 2
+prices_used_30_day = []
+dates_used_30_day = []
+weighting_30_day = smoothing_30_day/(30 + 1)
 
-for price in range(len(uvxy_prices) - time_period - moving_time_period, len(uvxy_prices)):
-    prices_used.append(uvxy_prices[price])
+for price in range(len(uvxy_prices) - time_period - 30, len(uvxy_prices)):
+    prices_used_30_day.append(uvxy_prices[price])
 
-first_run = true
+first_run = True
 # SMA & EMA
-for price in range(len(prices_used) - time_period - moving_time_period, len(prices_used)):
-    i = len(prices_used) - price
-    if len(prices_used[i - moving_time_period: i]) == 0:
+for price in range(len(prices_used_30_day) - time_period - 30, len(prices_used_30_day)):
+    i = len(prices_used_30_day) - price
+    if len(prices_used_30_day[i - 30: i]) == 0:
         continue
     else:
-        SMA_30_DAY.append(sum(prices_used[i - moving_time_period: i])/moving_time_period)
-        if first_run == true:
-            EMA_30_DAY.append(sum(prices_used[i - moving_time_period: i])/moving_time_period)
-            first_run = false
+        dates_used_30_day.append(uvxy_dates[len(uvxy_dates) - i + 30 - 1])
+        SMA_30_DAY.append(sum(prices_used_30_day[i - 30: i])/30)
+        if first_run == True:
+            EMA_30_DAY.append(sum(prices_used_30_day[i - 30: i])/30)
+            first_run = False
         else:
-            EMA_30_DAY.append( (EMA_30_DAY[-1] * (1 - weighting)) + (prices_used[i] * weighting) )
+            EMA_30_DAY.append( (EMA_30_DAY[-1] * (1 - weighting_30_day)) + (prices_used_30_day[i] * weighting_30_day) )
+
+# 5 day SMA/EMA
+time_period = 365
+SMA_5_DAY = []
+EMA_5_DAY = []
+smoothing_5_day = 2
+prices_used_5_day = []
+dates_used_5_day = []
+weighting_5_day = smoothing_5_day/(5 + 1)
+
+for price in range(len(uvxy_prices) - time_period - 5, len(uvxy_prices)):
+    prices_used_5_day.append(uvxy_prices[price])
+
+first_run = True
+# SMA & EMA
+for price in range(len(prices_used_5_day) - time_period - 5, len(prices_used_5_day)):
+    i = len(prices_used_5_day) - price
+    if len(prices_used_5_day[i - 5: i]) == 0:
+        continue
+    else:
+        dates_used_5_day.append(uvxy_dates[len(uvxy_dates) - i + 5 - 1])
+        SMA_5_DAY.append(sum(prices_used_5_day[i - 5: i])/5)
+        if first_run == True:
+            EMA_5_DAY.append(sum(prices_used_5_day[i - 5: i])/5)
+            first_run = False
+        else:
+            EMA_5_DAY.append( (EMA_5_DAY[-1] * (1 - weighting_5_day)) + (prices_used_5_day[i] * weighting_5_day) )
+
+
+# 30 Day MACD
+MACD_dates_30_Day = []
+Buy_Sell_Toggle_30_Day = False
+for x in range(0, len(SMA_30_DAY)):
+    if SMA_30_DAY[x] > EMA_30_DAY[x]:
+        if Buy_Sell_Toggle_30_Day == False:
+            Buy_Sell_Toggle_30_Day = True
+            logger.info('30 Day MACD BUY/SELL Triggered' + ' ' + str(x))
+            MACD_dates_30_Day.append(dates_used_30_day[x])
+
+    else:
+        if Buy_Sell_Toggle_30_Day == True:
+            Buy_Sell_Toggle_30_Day = False
+            logger.info('30 Day MACD BUY/SELL Triggered' + ' ' + str(x))
+            MACD_dates_30_Day.append(dates_used_30_day[x])
+
+# 5 day MACD
+MACD_dates_5_Day = []
+Buy_Sell_Toggle_5_Day = False
+for x in range(0, len(SMA_5_DAY)):
+    if SMA_5_DAY[x] > EMA_5_DAY[x]:
+        if Buy_Sell_Toggle_5_Day == False:
+            Buy_Sell_Toggle_5_Day = True
+            logger.info('5 Day MACD BUY/SELL Triggered' + ' ' + str(x))
+            MACD_dates_5_Day.append(dates_used_5_day[x])
+
+    else:
+        if Buy_Sell_Toggle_5_Day == True:
+            Buy_Sell_Toggle_5_Day = False
+            logger.info('5 Day MACD BUY/SELL Triggered' + ' ' + str(x))
+            MACD_dates_5_Day.append(dates_used_5_day[x]) 
+
 
 # Data flow to main.py
 def getContango():
@@ -250,3 +314,4 @@ def getSMA():
 
 def getEMA():
     return EMA_30_DAY
+
