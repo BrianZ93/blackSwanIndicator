@@ -310,8 +310,8 @@ def getUVXYAverages():
     return [uvxy_daily_average, uvxy_weekly_average, uvxy_monthly_average]
 
 def getSMA():
-    return SMA_30_DAY
+    return SMA_5_DAY
 
 def getEMA():
-    return EMA_30_DAY
+    return EMA_5_DAY
 
