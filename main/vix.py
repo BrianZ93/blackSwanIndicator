@@ -4,7 +4,6 @@ import logging
 from pylogrus import PyLogrus, TextFormatter
 
 
-
 today = datetime.date.today()
 today_string = str(today.year) + "-" + str(today.month) + "-" + str(today.day)
 start_string = str(today.year - 10) + "-" + str(today.month) + "-" + str(today.day)
@@ -300,6 +299,7 @@ for x in range(0, len(SMA_5_DAY)):
             Buy_Sell_Toggle_5_Day = False
             logger.info('5 Day MACD BUY/SELL Triggered' + ' ' + str(x))
             MACD_dates_5_Day.append(dates_used_5_day[x]) 
+
 
 
 # Data flow to main.py
